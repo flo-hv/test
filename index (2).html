@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0c0f14">
+<title>SHK Cold-Calls 📞</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📞</text></svg>">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;background:#0c0f14;color:#e2e6ee;min-height:100vh;min-height:100dvh;padding:0 0 100px;-webkit-font-smoothing:antialiased}
+  .header{position:sticky;top:0;z-index:100;background:rgba(12,15,20,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid #242b3a;padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top))}
+  .header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .header h1{font-size:17px;font-weight:700;letter-spacing:-.3px}
+  .stats{display:flex;gap:10px;font-size:11px;color:#7a839a;font-family:'SF Mono',Menlo,monospace;align-items:center;flex-wrap:wrap}
+  .sv{color:#e2e6ee;font-weight:500}
+  .ct{display:flex;align-items:center;gap:3px}
+  .cd{width:5px;height:5px;border-radius:50%;display:inline-block}
+  .section{position:sticky;top:64px;z-index:50;padding:8px 16px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;background:rgba(12,15,20,.95);backdrop-filter:blur(12px);border-bottom:1px solid #242b3a;display:flex;align-items:center;gap:7px}
+  .sd{width:6px;height:6px;border-radius:50%;display:inline-block}
+  .card{padding:12px 16px;border-bottom:1px solid #1c2233;position:relative}
+  .card-bar{position:absolute;left:0;top:0;bottom:0;width:4px;background:transparent;transition:background .2s;border-radius:0 2px 2px 0}
+  .card-row1{display:flex;align-items:center;gap:10px}
+  .cnum{font-family:'SF Mono',Menlo,monospace;font-size:11px;color:#7a839a;width:20px;text-align:right;flex-shrink:0}
+  .cinfo{flex:1;min-width:0}
+  .cname{font-size:15px;font-weight:500;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cphone{font-family:'SF Mono',Menlo,monospace;font-size:11px;color:#7a839a;margin-top:1px}
+  .cmeta{font-size:10px;color:#555e73;margin-top:2px;font-family:'SF Mono',Menlo,monospace;display:flex;gap:10px;align-items:center}
+  .cmeta .cc{color:#7a839a}.cmeta .lc{color:#555e73}
+  .cnote-text{font-size:11px;color:#a78bfa;margin-top:2px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nbtn{width:34px;height:34px;border-radius:50%;background:transparent;border:1px solid #242b3a;color:#7a839a;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
+  .nbtn.has{border-color:#a78bfa;color:#a78bfa}
+  .cbtn{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:#22c55e;border:none;flex-shrink:0;text-decoration:none;transition:transform .1s}
+  .cbtn:active{transform:scale(.9)}
+  .cbtn svg{width:20px;height:20px;fill:#fff}
+  .card-row2{display:flex;gap:5px;margin-top:8px;padding-left:30px}
+  .pill{flex:1;text-align:center;font-size:9px;font-weight:600;padding:6px 2px;border-radius:6px;cursor:pointer;border:1px solid #242b3a;background:transparent;color:#7a839a;font-family:'SF Mono',Menlo,monospace;transition:all .12s;-webkit-user-select:none;user-select:none}
+  .pill:active{transform:scale(.95)}
+  .pill.a-ai{background:rgba(167,139,250,.12);color:#a78bfa;border-color:#a78bfa}
+  .pill.a-ab{background:rgba(245,158,11,.12);color:#f59e0b;border-color:#f59e0b}
+  .pill.a-erreicht{background:rgba(59,130,246,.12);color:#3b82f6;border-color:#3b82f6}
+  .pill.a-termin{background:rgba(34,197,94,.15);color:#22c55e;border-color:#22c55e}
+  .pill.a-nein{background:rgba(239,68,68,.12);color:#ef4444;border-color:#ef4444}
+  .mo{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:flex;align-items:flex-end;justify-content:center}
+  .modal{background:#151922;border:1px solid #242b3a;border-radius:20px 20px 0 0;padding:20px 16px 30px;width:100%;max-width:500px;padding-bottom:calc(30px + env(safe-area-inset-bottom))}
+  .modal h3{font-size:15px;font-weight:600;margin-bottom:12px}
+  .modal textarea{width:100%;height:90px;background:#0c0f14;border:1px solid #242b3a;border-radius:10px;color:#e2e6ee;font-family:inherit;font-size:15px;padding:10px;resize:none;outline:none}
+  .modal textarea:focus{border-color:#a78bfa}
+  .mactions{display:flex;gap:8px;margin-top:12px}
+  .mactions button{flex:1;padding:12px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer}
+  .mc{background:#242b3a;color:#7a839a}.mdel{background:rgba(239,68,68,.15);color:#ef4444}.ms{background:#a78bfa;color:#fff}
+  .fab{position:fixed;right:16px;z-index:200;width:52px;height:52px;border-radius:50%;background:#151922;border:1px solid #242b3a;color:#e2e6ee;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+  .fab:active{transform:scale(.9)}
+  .fab-script{bottom:calc(20px + env(safe-area-inset-bottom))}
+  .fab-export{bottom:calc(80px + env(safe-area-inset-bottom));font-size:18px}
+  .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+  .toast.show{opacity:1}
+  .pov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:140;opacity:0;pointer-events:none;transition:opacity .3s}
+  .pov.show{opacity:1;pointer-events:auto}
+  .sp{position:fixed;bottom:0;left:0;right:0;z-index:150;background:#151922;border-top:1px solid #242b3a;border-radius:20px 20px 0 0;padding:20px 16px 30px;padding-bottom:calc(30px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .3s ease;max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .sp.open{transform:translateY(0)}
+  .sp h2{font-size:16px;font-weight:700;margin-bottom:14px}
+  .ss{margin-bottom:16px}
+  .ss h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#22c55e;margin-bottom:6px}
+  .ss p{font-size:14px;line-height:1.6}
+  .ss .line{padding:6px 0}
+  .ss .dim{color:#7a839a;font-style:italic;font-size:13px}
+  .ss .highlight{color:#f59e0b}
+  .sep{margin:16px 0;border:none;border-top:1px solid #242b3a}
+  .rbtn{display:block;margin:20px auto 0;padding:10px 20px;background:transparent;border:1px solid #242b3a;color:#7a839a;border-radius:10px;cursor:pointer;font-size:12px;font-family:'SF Mono',Menlo,monospace}
+  @media(min-width:500px){body{max-width:500px;margin:0 auto}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-top"><h1>SHK Cold-Calls 📞</h1></div>
+  <div class="stats">
+    <span><span class="sv" id="total">42</span> Betriebe</span><span>·</span>
+    <span class="ct"><span class="cd" style="background:#a78bfa"></span><span id="c-ai">0</span></span>
+    <span class="ct"><span class="cd" style="background:#f59e0b"></span><span id="c-ab">0</span></span>
+    <span class="ct"><span class="cd" style="background:#3b82f6"></span><span id="c-erreicht">0</span></span>
+    <span class="ct"><span class="cd" style="background:#22c55e"></span><span id="c-termin">0</span></span>
+    <span class="ct"><span class="cd" style="background:#ef4444"></span><span id="c-nein">0</span></span>
+  </div>
+</div>
+<div id="list"></div>
+<button class="fab fab-export" id="exportBtn" title="CSV Export">📥</button>
+<button class="fab fab-script" id="fabBtn">📋</button>
+<div class="toast" id="toast">CSV heruntergeladen ✓</div>
+<div class="pov" id="pov"></div>
+<div class="sp" id="sp">
+  <h2>📋 Skript</h2>
+
+  <div class="ss">
+    <h3>1 — Eröffnung</h3>
+    <p class="line">„Servus, hier ist [NAME]. Das ist ein Akquise-Anruf — möchten Sie gleich auflegen, oder hab ich 30 Sekunden?"</p>
+    <p class="dim">(Antwort abwarten)</p>
+  </div>
+
+  <div class="ss">
+    <h3>2 — Problem ansprechen</h3>
+    <p class="line">„Ich sprech viel mit SHK-Betrieben hier in der Region, und die meisten sagen mir das Gleiche: Wenn Sie auf der Baustelle sind, gehen Anrufe verloren. Kunden landen auf dem AB, und viele rufen einfach beim nächsten an."</p>
+    <p class="line" style="margin-top:6px">„Aber wahrscheinlich ist das bei Ihnen gar kein Thema."</p>
+    <p class="dim">(Antwort abwarten — Inhaber reden lassen)</p>
+  </div>
+
+  <div class="ss">
+    <h3>3 — Lösung anbieten</h3>
+    <p class="line">„Wär's eine schlechte Idee, wenn ich Ihnen in 15 Minuten online zeig, wie ein KI-Telefonassistent das für Sie übernimmt? Der nimmt jeden Anruf an, fragt was gebraucht wird, und schickt Ihnen alles sauber aufs Handy. Kein Kunde geht mehr verloren."</p>
+    <p class="dim">(Antwort abwarten)</p>
+  </div>
+
+  <div class="ss">
+    <h3>4 — Termin fixieren</h3>
+    <p class="line">„Wann passt's bei Ihnen in den nächsten Tagen am besten?"</p>
+    <p class="dim">(Antwort abwarten)</p>
+    <p class="line" style="margin-top:6px">„Haben Sie eine E-Mail, an die ich die Einladung schicken kann?"</p>
+    <p class="dim">(Antwort abwarten)</p>
+  </div>
+
+  <div class="ss">
+    <h3>5 — Abschluss</h3>
+    <p class="line">„Super, dann schauen wir uns das an — und danach können Sie entscheiden, ob's für Sie passt. Im schlechtesten Fall nehmen Sie ein paar gute Ideen mit."</p>
+  </div>
+
+  <hr class="sep">
+
+  <div class="ss">
+    <h3>Einwände</h3>
+    <p class="line"><span class="highlight">„Hab grad keine Zeit"</span></p>
+    <p class="line">→ „Versteh ich total, deswegen ruf ich ja an und schreib nicht. Wann passt's besser — morgen früh oder eher Ende der Woche?"</p>
+    <p class="line" style="margin-top:10px"><span class="highlight">„Brauchen wir nicht"</span></p>
+    <p class="line">→ „Das höre ich oft — bis die Leute sehen, wie viele Anrufe wirklich ins Leere gehen. Die meisten sagen mir 5–10 am Tag. 15 Minuten Demo, dann sehen Sie's selbst."</p>
+    <p class="line" style="margin-top:10px"><span class="highlight">„Was kostet das?"</span></p>
+    <p class="line">→ „Weniger als eine Teilzeitkraft, und rund um die Uhr erreichbar. Aber am besten zeig ich's Ihnen kurz — dann können Sie selber einschätzen ob's sich rechnet."</p>
+    <p class="line" style="margin-top:10px"><span class="highlight">„Schicken Sie was zu"</span></p>
+    <p class="line">→ „Mach ich gern — welche E-Mail? Darf ich Ende der Woche kurz nachfragen ob Sie's gesehen haben?"</p>
+  </div>
+
+  <hr class="sep">
+  <div class="ss">
+    <h3>Regeln</h3>
+    <p>Max. 3 Min. pro Call · Ziel = Termin, nicht Abschluss · Inhaber reden lassen</p>
+  </div>
+  <button class="rbtn" onclick="if(confirm('Alle Daten zurücksetzen?')){localStorage.removeItem('shk2-s');localStorage.removeItem('shk2-n');localStorage.removeItem('shk2-cl');location.reload();}">Tracking zurücksetzen</button>
+</div>
+<div id="nm" style="display:none"></div>
+
+<script>
+const C=[
+  {s:"LANDSHUT STADT",c:"landshut"},
+  {n:"Karl Jakucs GmbH",p:"0871 953090"},
+  {n:"Gerhard Nemela",p:"0871 71438"},
+  {n:"Karl Fries Haustechnik",p:"0871 40104"},
+  {n:"Armin Pfeiffer",p:"0871 69124"},
+  {n:"Bernhard Thurmaier",p:"0871 23298"},
+  {n:"Thomas Husslik",p:"0871 53482"},
+  {n:"DS Elektrotherm GmbH",p:"0871 94332-0"},
+  {n:"HLS-Stenzenberger GmbH",p:"0871 96613380"},
+  {n:"JARF GmbH",p:"0871 43064103"},
+  {n:"Johann Schwemmhuber",p:"0871 33649"},
+  {n:"Norbert Senger",p:"0871 36335"},
+  {n:"ALP Ing. GmbH",p:"09452 8549800"},
+  {n:"Manfred Koch",p:"08702 948628"},
+  {n:"Hans Neumayr",p:"0871 55180"},
+  {n:"Christian Hampp",p:"0871 51437"},
+  {s:"ERGOLDING / ALTDORF",c:"ergolding"},
+  {n:"Oberpriller Haustechnik GmbH",p:"08704 8383"},
+  {n:"Gleisberg GmbH",p:"0871 97257-0"},
+  {n:"Aristotherm",p:"0871 974250"},
+  {n:"Weiß Andreas Haustechnik GmbH",p:"0871 97473642"},
+  {n:"Olzinger GmbH",p:"0871 72617"},
+  {n:"Brunner Anlagenbau GmbH",p:"0871 9747277-0"},
+  {n:"Bernhard Angermeier",p:"0871 12857"},
+  {n:"Zeiler Erhard",p:"0871 77951"},
+  {n:"Georg Stanglmeier GmbH",p:"0871 932370"},
+  {n:"Habermeier Anton GmbH",p:"0871 93300-0"},
+  {n:"Klaus Lehner",p:"08784 1220"},
+  {s:"UMLAND",c:"umland"},
+  {n:"Josef Loibl",p:"08709 95551"},
+  {n:"QN Haus- & Gebäudetechnik",p:"0151 17684774"},
+  {n:"Olschewski GmbH",p:"0871 35644"},
+  {n:"ITG GmbH",p:"0871 9453998"},
+  {n:"Helmut Ingerl",p:"08709 3910"},
+  {n:"Kerscher OHG",p:"08702 947430"},
+  {n:"Rohrbau + Haustechnik GmbH",p:"08703 93240"},
+  {n:"Aschenbrenner Josef GmbH",p:"08703 90590"},
+  {n:"Siegfried Fürholzner GmbH",p:"08703 475"},
+  {n:"Gerhard Loibl GmbH",p:"08708 277"},
+  {n:"Haustechnik König GmbH",p:"08784 712"},
+  {n:"Hiebl GmbH",p:"08706 941061"},
+  {n:"Rasshofer GmbH",p:"08765 514"},
+  {n:"Schmied vo Ast",p:"08709 564"},
+  {n:"TS Heizung und Sanitär",p:"08703 4656552"},
+];
+
+const SC={landshut:"#6366f1",ergolding:"#8b5cf6",umland:"#a78bfa"};
+const STC={ai:"#a78bfa",ab:"#f59e0b",erreicht:"#3b82f6",termin:"#22c55e",nein:"#ef4444"};
+const STL={ai:"🤖 AI",ab:"📱 AB",erreicht:"📞 Erreicht",termin:"✓ Termin",nein:"✗ Nein"};
+const STK=Object.keys(STL);
+
+function toIntl(p){let c=p.replace(/[\s\-]/g,'');return c[0]==='0'?'+49'+c.slice(1):c;}
+
+// Data — tags are now arrays (multi-select)
+let sts=JSON.parse(localStorage.getItem('shk2-s')||'{}'); // {idx: [tag, tag, ...]}
+let nts=JSON.parse(localStorage.getItem('shk2-n')||'{}');
+let cls=JSON.parse(localStorage.getItem('shk2-cl')||'{}');
+
+// Migration: if old data has string values, convert to arrays
+Object.keys(sts).forEach(k=>{if(typeof sts[k]==='string')sts[k]=[sts[k]];});
+
+function save(){
+  localStorage.setItem('shk2-s',JSON.stringify(sts));
+  localStorage.setItem('shk2-n',JSON.stringify(nts));
+  localStorage.setItem('shk2-cl',JSON.stringify(cls));
+}
+
+function fmtTime(ts){return new Date(ts).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}
+
+function uc(){
+  // Count each tag across all contacts
+  const all=Object.values(sts).flat();
+  STK.forEach(k=>{document.getElementById('c-'+k).textContent=all.filter(x=>x===k).length;});
+}
+
+function getBarColor(tags){
+  if(!tags||!tags.length)return 'transparent';
+  // Priority: termin > erreicht > ab > ai > nein
+  const prio=['termin','erreicht','ab','ai','nein'];
+  for(const p of prio){if(tags.includes(p))return STC[p];}
+  return 'transparent';
+}
+
+function updateMeta(idx){
+  const log=cls[idx]||[];
+  const el=document.getElementById('meta-'+idx);
+  if(!log.length){el.style.display='none';return;}
+  el.style.display='flex';
+  el.innerHTML=`<span class="cc">📞 ${log.length}×</span><span class="lc">zuletzt ${fmtTime(log[log.length-1])}</span>`;
+}
+
+function updateCard(idx){
+  const tags=sts[idx]||[];
+  const card=document.getElementById('c-'+idx);
+  const bar=card.querySelector('.card-bar');
+  const name=card.querySelector('.cname');
+  bar.style.background=getBarColor(tags);
+  name.style.textDecoration=tags.includes('nein')?'line-through':'none';
+  name.style.opacity=tags.includes('nein')?'.5':'1';
+  // Update pill states
+  card.querySelectorAll('.pill').forEach(p=>{
+    const s=p.dataset.s;
+    p.className='pill'+(tags.includes(s)?' a-'+s:'');
+  });
+}
+
+const list=document.getElementById('list');
+let num=0,totalContacts=0;
+
+C.forEach(item=>{
+  if(item.s){
+    const d=document.createElement('div');
+    d.className='section';
+    d.innerHTML=`<span class="sd" style="background:${SC[item.c]}"></span>${item.s}`;
+    list.appendChild(d);return;
+  }
+  num++;totalContacts++;
+  const i=num,intl=toIntl(item.p),tags=sts[i]||[],nt=nts[i]||'';
+  const log=cls[i]||[];const hasLog=log.length>0;
+  const card=document.createElement('div');
+  card.className='card';card.id='c-'+i;
+  card.innerHTML=`
+    <div class="card-bar" style="background:${getBarColor(tags)}"></div>
+    <div class="card-row1">
+      <span class="cnum">${i}</span>
+      <div class="cinfo">
+        <div class="cname" style="${tags.includes('nein')?'text-decoration:line-through;opacity:.5':''}">${item.n}</div>
+        <div class="cphone">${item.p}</div>
+        <div class="cmeta" id="meta-${i}" style="display:${hasLog?'flex':'none'}">${hasLog?`<span class="cc">📞 ${log.length}×</span><span class="lc">zuletzt ${fmtTime(log[log.length-1])}</span>`:''}</div>
+        <div class="cnote-text" id="nt-${i}" style="display:${nt?'block':'none'}">${nt}</div>
+      </div>
+      <button class="nbtn ${nt?'has':''}" id="nb-${i}" onclick="openN(${i},'${item.n.replace(/'/g,"\\'")}')">✎</button>
+      <a href="tel:${intl}" class="cbtn" data-ci="${i}">
+        <svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.58.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.58 1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>
+      </a>
+    </div>
+    <div class="card-row2">
+      ${STK.map(k=>`<button class="pill ${tags.includes(k)?'a-'+k:''}" data-s="${k}" data-i="${i}">${STL[k]}</button>`).join('')}
+    </div>`;
+  list.appendChild(card);
+});
+document.getElementById('total').textContent=totalContacts;
+uc();
+
+// Log calls
+document.addEventListener('click',e=>{
+  const cb=e.target.closest('.cbtn');
+  if(cb){const idx=cb.dataset.ci;if(!idx)return;if(!cls[idx])cls[idx]=[];cls[idx].push(Date.now());save();updateMeta(idx);}
+});
+
+// Multi-select status pills
+document.addEventListener('click',e=>{
+  const pill=e.target.closest('.pill');
+  if(!pill)return;
+  const idx=pill.dataset.i,s=pill.dataset.s;
+  if(!sts[idx])sts[idx]=[];
+  const tags=sts[idx];
+  const pos=tags.indexOf(s);
+  if(pos>-1)tags.splice(pos,1); else tags.push(s);
+  if(!tags.length)delete sts[idx];
+  save();uc();updateCard(idx);
+});
+
+// Notes
+const nm=document.getElementById('nm');
+function openN(idx,name){
+  const cur=nts[idx]||'';
+  nm.style.display='';
+  nm.innerHTML=`<div class="mo"><div class="modal"><h3>📝 ${name}</h3><textarea id="ni" placeholder="Notiz…">${cur}</textarea><div class="mactions">${cur?'<button class="mdel" id="ndel">Löschen</button>':''}<button class="mc" onclick="closeN()">Zurück</button><button class="ms" id="nsave">Speichern</button></div></div></div>`;
+  document.getElementById('nsave').onclick=()=>saveN(idx);
+  if(cur)document.getElementById('ndel').onclick=()=>delN(idx);
+  setTimeout(()=>document.getElementById('ni').focus(),50);
+}
+function saveN(idx){const v=document.getElementById('ni').value.trim();if(!v){delN(idx);return;}nts[idx]=v;document.getElementById('nt-'+idx).textContent=v;document.getElementById('nt-'+idx).style.display='block';document.getElementById('nb-'+idx).classList.add('has');save();closeN();}
+function delN(idx){delete nts[idx];document.getElementById('nt-'+idx).style.display='none';document.getElementById('nb-'+idx).classList.remove('has');save();closeN();}
+function closeN(){nm.style.display='none';nm.innerHTML='';}
+
+// Script panel
+const fab=document.getElementById('fabBtn'),sp=document.getElementById('sp'),pov=document.getElementById('pov');
+fab.onclick=()=>{sp.classList.toggle('open');pov.classList.toggle('show');};
+pov.onclick=()=>{sp.classList.remove('open');pov.classList.remove('show');};
+
+// CSV Export
+document.getElementById('exportBtn').onclick=()=>{
+  const header='Nr;Betrieb;Telefon;Telefon_Intl;Region;Tags;Anrufe;Letzter_Anruf;Alle_Anrufzeiten;Notiz';
+  const rows=[];let n=0,region='';
+  const tagLabels={ai:'AI',ab:'Anrufbeantworter',erreicht:'Erreicht',termin:'Termin',nein:'Kein Interesse'};
+  C.forEach(item=>{
+    if(item.s){region=item.s;return;}
+    n++;
+    const tags=(sts[n]||[]).map(t=>tagLabels[t]||t).join(', ')||'Offen';
+    const nt=(nts[n]||'').replace(/"/g,'""');
+    const log=cls[n]||[];
+    const lastCall=log.length?new Date(log[log.length-1]).toLocaleString('de-DE'):'';
+    const allCalls=log.map(t=>new Date(t).toLocaleString('de-DE')).join(' | ');
+    rows.push(`${n};"${item.n}";"${item.p}";"${toIntl(item.p)}";"${region}";"${tags}";${log.length};"${lastCall}";"${allCalls}";"${nt}"`);
+  });
+  const csv='\uFEFF'+header+'\n'+rows.join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');const d=new Date();
+  a.href=url;a.download=`shk-calls-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.csv`;
+  a.click();URL.revokeObjectURL(url);
+  const toast=document.getElementById('toast');toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2000);
+};
+</script>
+</body>
+</html>
